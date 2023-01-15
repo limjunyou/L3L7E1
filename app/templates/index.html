@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>360&deg; Image Gallery</title>
+    <meta name="description" content="360&deg; Image Gallery - A-Frame">
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@5/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-layout-component@5.3.0/dist/aframe-layout-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-proxy-event-component@2.1.0/dist/aframe-proxy-event-component.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
+    <script>
+      AFRAME.registerComponent('mythreejsthing', {
+        schema: {
+          color: {
+            default: '#000'
+          },
+        },
+        update: function() {
+          var material = new THREE.MeshBasicMaterial({
+            color: this.data.color,
+            //wireframe: true,
+            transparent:true, 
+            opacity:0.5
+          });
+      
+          var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+          //var geometry = new THREE.ConeGeometry( 0.5, 1, 32 );;
+      
+          this.el.setObject3D('mesh', new THREE.Mesh(geometry, material));
+        },
+      
+        remove: function() {
+          this.el.removeObject3D('mesh');
+        }
+      });
+    </script> 
+<script>
+  AFRAME.registerComponent('listener_obj', {
+  init: function() {
+    this.el.addEventListener('mouseenter', (e) => {
+      var objectid = this.el.id;
+      if (objectid=="object1")
+      {
+            document.getElementById("objects").object3D.visible = true;
+      }
+      if (objectid=="object2")
+      {
+            document.getElementById("objects2").object3D.visible = true;
+      }
+
+    })
+    this.el.addEventListener('mouseleave', (e) => {
+      document.getElementById("objects").object3D.visible = false;
+      document.getElementById("objects2").object3D.visible = false;
+    })
+  }
+})
+</script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img id="city" src="static/background.jpg">
+        <img id="chess_thumb" src="static/object.jpg">
+        <a-asset-item id="dragon" src="static/BoxVertexColors.gltf"></a-asset-item>
+        <a-asset-item id="waterbottol" src="static/Buggy.gltf"></a-asset-item>
+      </a-assets>
+
+      <!-- 360-degree image. -->
+      <a-sky id="image-360" radius="15" src="#city"></a-sky>
+  
+      <!-- Button . -->
+      <a-entity id="object1" listener_obj position="-9 -3 -2" rotation="0 90 0">
+        <a-image  class="link" src="#chess_thumb" width="2"></a-image>
+      </a-entity>
+
+      <a-entity id="object2" listener_obj position="0 -2 5" rotation="0 180 0">
+        <a-image  class="link" src="#chess_thumb" width="2"></a-image>
+      </a-entity>
+
+      <!-- object show. -->
+      <a-entity id="objects" visible="false">       
+        <a-entity position="-4 -0.5 -1" 
+                  rotation="0 0 0"
+                  scale="0.5 0.5 0.5"
+                  gltf-model="#dragon"
+                  animation__rotate = "property: rotation; dur: 8000; easing: linear; dir: normal; from:0 0 0; to: 0 360 0; loop: true;">
+        </a-entity>
+      </a-entity>
+
+      <a-entity id="objects2" visible="false">       
+        <a-entity position="0 0 5" 
+                  rotation="0 90 45"
+                  scale="0.01 0.01 0.01"
+                  gltf-model="#waterbottol"
+                  animation__rotate = "property: rotation; dur: 8000; easing: linear; dir: normal; from:0 0 0; to: 0 360 0; loop: true;">
+        </a-entity>
+      </a-entity>
+
+      <!-- Camera + cursor. -->
+      <a-entity camera look-controls>
+        <a-cursor
+          id="cursor"
+          animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+          animation__fusing="property: fusing; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+          event-set__mouseenter="_event: mouseenter; color: springgreen"
+          event-set__mouseleave="_event: mouseleave; color: black"
+          raycaster="objects: .link"></a-cursor>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
